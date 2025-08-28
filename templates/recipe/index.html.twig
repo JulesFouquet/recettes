@@ -1,0 +1,121 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}GourmetHub - Recettes
+{% endblock %}
+
+{% block body %}
+	<div class="container mt-5 text-center">
+		<h1 class="display-4 fw-bold">GourmetHub</h1>
+		<p class="lead mb-5">
+			Découvrez, partagez et gérez vos recettes préférées facilement.
+			        Explorez par catégorie, temps de préparation ou ingrédient.
+		</p>
+
+		{% if app.user %}
+			<a href="{{ path('recipe_new') }}" class="btn btn-lg btn-success mb-4">
+				Ajouter une recette
+			</a>
+		{% endif %}
+
+		<div class="row row-cols-1 row-cols-md-3 g-4">
+			{% for recipe in recipes %}
+				<div class="col">
+					<div class="card h-100 shadow-sm">
+						{% if recipe.image %}
+							<img src="{{ recipe.image }}" class="card-img-top" alt="{{ recipe.title }}">
+						{% else %}
+							<img src="https://via.placeholder.com/400x200?text=Recette" class="card-img-top" alt="{{ recipe.title }}">
+						{% endif %}
+						<div class="card-body">
+							<h5 class="card-title">{{ recipe.title }}</h5>
+							<p class="card-text">{{ recipe.description|slice(0, 80) ~ '...' }}</p>
+							<p class="mb-1">
+								<strong>Catégorie:</strong>
+								{{ recipe.category.name }}</p>
+							<p class="mb-1">
+								<strong>Préparation:</strong>
+								{{ recipe.preparationTime }}
+								min</p>
+						</div>
+						<div class="card-footer d-flex justify-content-between align-items-center">
+							<a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#recipeModal{{ recipe.id }}">
+								Voir
+							</a>
+							<button class="btn btn-sm btn-outline-warning favorite-btn" data-id="{{ recipe.id }}">
+								<i class="fa-regular fa-star"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+
+				{# Modale pour la recette #}
+				<div class="modal fade" id="recipeModal{{ recipe.id }}" tabindex="-1" aria-labelledby="recipeModalLabel{{ recipe.id }}" aria-hidden="true">
+					<div class="modal-dialog modal-lg modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="recipeModalLabel{{ recipe.id }}">{{ recipe.title }}</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+							</div>
+							<div class="modal-body">
+								{% if recipe.image %}
+									<img src="{{ recipe.image }}" class="img-fluid mb-3" alt="{{ recipe.title }}">
+								{% endif %}
+								<p>
+									<strong>Description:</strong>
+									{{ recipe.description }}</p>
+								<p>
+									<strong>Ingrédients:</strong>
+								</p>
+								<pre>{{ recipe.ingredients }}</pre>
+								<p>
+									<strong>Étapes:</strong>
+								</p>
+								<pre>{{ recipe.steps }}</pre>
+								<p>
+									<strong>Catégorie:</strong>
+									{{ recipe.category.name }}</p>
+								<p>
+									<strong>Préparation:</strong>
+									{{ recipe.preparationTime }}
+									min</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			{% else %}
+				<p class="text-muted mt-5">Aucune recette pour le moment. Soyez le premier à en ajouter !</p>
+			{% endfor %}
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+const buttons = document.querySelectorAll('.favorite-btn');
+buttons.forEach(btn => {
+btn.addEventListener('click', function () {
+const recipeId = this.dataset.id;
+const csrfToken = '{{ csrf_token("authenticate") }}';
+
+fetch('{{ path("favorite_toggle", {"id": "REPLACE_ID"}) }}'.replace('REPLACE_ID', recipeId), {
+method: 'POST',
+headers: {
+'X-Requested-With': 'XMLHttpRequest',
+'X-CSRF-TOKEN': csrfToken
+}
+}).then(response => response.json()).then(data => {
+if (data.status === 'added') {
+this.querySelector('i').classList.remove('fa-regular');
+this.querySelector('i').classList.add('fa-solid');
+} else if (data.status === 'removed') {
+this.querySelector('i').classList.remove('fa-solid');
+this.querySelector('i').classList.add('fa-regular');
+}
+}).catch(err => console.error('Erreur favorite:', err));
+});
+});
+});
+	</script>
+{% endblock %}
