@@ -1,0 +1,152 @@
+/* ========================
+   Global styles
+======================== */
+body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background-color: #fff8f0;
+    color: #333;
+}
+
+a {
+    text-decoration: none;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+/* ========================
+   Navbar
+======================== */
+.navbar {
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+}
+
+.navbar .navbar-brand {
+    color: #ff6b35;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.navbar .nav-link {
+    color: #555;
+    font-weight: 500;
+}
+
+.navbar .nav-link:hover {
+    color: #ff6b35;
+}
+
+/* ========================
+   Buttons
+======================== */
+.btn-primary {
+    background-color: #ff6b35;
+    border-color: #ff6b35;
+}
+
+.btn-primary:hover {
+    background-color: #ff5a1a;
+    border-color: #ff5a1a;
+}
+
+.btn-success {
+    background-color: #6bcb77;
+    border-color: #6bcb77;
+}
+
+.btn-success:hover {
+    background-color: #57a562;
+    border-color: #57a562;
+}
+
+.btn-outline-primary {
+    color: #ff6b35;
+    border-color: #ff6b35;
+}
+
+.btn-outline-primary:hover {
+    background-color: #ff6b35;
+    color: #fff;
+}
+
+/* ========================
+   Cards
+======================== */
+.card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-weight: bold;
+    color: #ff6b35;
+}
+
+.card-text {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* ========================
+   Forms
+======================== */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: #ff6b35;
+    box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
+}
+
+/* ========================
+   Headers & text
+======================== */
+h1,
+h2,
+h3 {
+    color: #ff6b35;
+}
+
+.lead {
+    font-size: 1.2rem;
+    color: #555;
+}
+
+/* ========================
+   Alerts
+======================== */
+.alert {
+    border-radius: 8px;
+}
+
+/* ========================
+   Modals
+======================== */
+.modal-content {
+    border-radius: 12px;
+}
+
+/* ========================
+   Footer (optionnel)
+======================== */
+footer {
+    background-color: #fff;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+    text-align: center;
+    color: #777;
+    font-size: 0.9rem;
+}

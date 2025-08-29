@@ -46,12 +46,24 @@ class Recipe
     /**
      * @var Collection<int, Favorite>
      */
-    #[ORM\OneToMany(targetEntity: Favorite::class, mappedBy: 'recipe')]
+    #[ORM\OneToMany(targetEntity: Favorite::class, mappedBy: 'recipe', orphanRemoval: true)]
     private Collection $favorites;
+
+    /**
+     * @var Collection<int, Rating>
+     */
+    #[ORM\OneToMany(targetEntity: Rating::class, mappedBy: 'recipe', orphanRemoval: true)]
+    private Collection $ratings;
+
+    #[ORM\Column(options: ['default' => 0])]
+    private ?int $views = 0;
 
     public function __construct()
     {
         $this->favorites = new ArrayCollection();
+        $this->ratings = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->views = 0;
     }
 
     public function getId(): ?int
@@ -188,12 +200,77 @@ class Recipe
     public function removeFavorite(Favorite $favorite): static
     {
         if ($this->favorites->removeElement($favorite)) {
-            // set the owning side to null (unless already changed)
             if ($favorite->getRecipe() === $this) {
                 $favorite->setRecipe(null);
             }
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Rating>
+     */
+    public function getRatings(): Collection
+    {
+        return $this->ratings;
+    }
+
+    public function addRating(Rating $rating): static
+    {
+        if (!$this->ratings->contains($rating)) {
+            $this->ratings->add($rating);
+            $rating->setRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRating(Rating $rating): static
+    {
+        if ($this->ratings->removeElement($rating)) {
+            if ($rating->getRecipe() === $this) {
+                $rating->setRecipe(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getViews(): int
+    {
+        return $this->views;
+    }
+
+    public function setViews(int $views): static
+    {
+        $this->views = $views;
+
+        return $this;
+    }
+
+    public function incrementViews(): static
+    {
+        $this->views++;
+        return $this;
+    }
+
+    public function getAverageRating(): float
+    {
+        if ($this->ratings->count() === 0) {
+            return 0;
+        }
+
+        $sum = 0;
+        foreach ($this->ratings as $rating) {
+            $sum += $rating->getValue(); // correction
+        }
+
+        return $sum / $this->ratings->count();
+    }
+
+    public function getRatingCount(): int
+    {
+        return $this->ratings->count();
     }
 }

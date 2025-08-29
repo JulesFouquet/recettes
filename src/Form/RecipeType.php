@@ -25,7 +25,8 @@ class RecipeType extends AbstractType
             ->add('image', TextType::class, ['required' => false])
             ->add('category', EntityType::class, [
                 'class' => Category::class,
-                'choice_label' => 'name'
+                'choice_label' => 'name',
+                'required' => true,
             ]);
     }
 

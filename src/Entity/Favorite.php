@@ -24,6 +24,11 @@ class Favorite
     #[ORM\Column(type: 'datetime_immutable')]
     private ?\DateTimeImmutable $createdAt = null;
 
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -63,5 +68,13 @@ class Favorite
         $this->createdAt = $createdAt;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return sprintf('Favorite (user: %s, recipe: %s)', 
+            $this->owner?->getEmail() ?? 'unknown', 
+            $this->recipe?->getTitle() ?? 'unknown'
+        );
     }
 }

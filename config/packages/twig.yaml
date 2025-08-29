@@ -1,6 +1,10 @@
+# config/packages/twig.yaml
 twig:
-    file_name_pattern: '*.twig'
+    default_path: "%kernel.project_dir%/templates"
+    file_name_pattern: "*.twig" # Applique Twig uniquement aux fichiers *.twig
+    strict_variables: false # Par défaut désactivé, pour dev/prod
 
+# Configuration spécifique à l'environnement de test
 when@test:
     twig:
         strict_variables: true

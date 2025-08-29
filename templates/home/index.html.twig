@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - GourmetHub
+{% endblock %}
+
+{% block body %}
+	<div
+		class="container mt-5">
+
+		<!-- Section de bienvenue -->
+		<section class="text-center mb-5">
+			<h1 class="display-4 fw-bold">Bienvenue sur GourmetHub</h1>
+			<p class="lead">Découvrez, partagez et sauvegardez vos recettes de cuisine préférées !</p>
+			<a href="{{ path('recipe_index') }}" class="btn btn-primary btn-lg mt-3">Voir toutes les recettes</a>
+		</section>
+
+		<!-- Section recettes populaires -->
+		<section>
+			<h2 class="mb-4">Nos recettes populaires</h2>
+
+			<div
+				class="row">
+				<!-- Recette la plus vue -->
+				<div class="col-md-4 mb-4">
+					<div class="card shadow-sm h-100">
+						{% if mostViewed %}
+							{% if mostViewed.image %}
+								<img src="{{ mostViewed.image }}" class="card-img-top" alt="{{ mostViewed.title }}">
+							{% endif %}
+							<div class="card-body">
+								<h3 class="card-title">{{ mostViewed.title }}</h3>
+								<p class="mb-2">
+									<strong>Catégorie:</strong>
+									{{ mostViewed.category.name }}</p>
+								<p class="mb-2">
+									<strong>Préparation:</strong>
+									{{ mostViewed.preparationTime }}
+									min</p>
+								<p class="card-text">{{ mostViewed.description|u.truncate(100, '...') }}</p>
+							</div>
+							<div class="card-footer text-muted text-center">
+								{{ mostViewed.views }}
+								vues
+							</div>
+						{% else %}
+							<div class="card-body text-center">
+								<p>Aucune recette trouvée</p>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+
+				<!-- Recette la mieux notée -->
+				<div class="col-md-4 mb-4">
+					<div class="card shadow-sm h-100">
+						{% if bestRated %}
+							{% if bestRated.image %}
+								<img src="{{ bestRated.image }}" class="card-img-top" alt="{{ bestRated.title }}">
+							{% endif %}
+							<div class="card-body">
+								<h3 class="card-title">{{ bestRated.title }}</h3>
+								<p class="mb-2">
+									<strong>Catégorie:</strong>
+									{{ bestRated.category.name }}</p>
+								<p class="mb-2">
+									<strong>Préparation:</strong>
+									{{ bestRated.preparationTime }}
+									min</p>
+								<p class="card-text">{{ bestRated.description|u.truncate(100, '...') }}</p>
+							</div>
+							<div class="card-footer text-muted text-center">
+								⭐
+								{{ bestRated.getAverageRating()|number_format(1) }}/5
+							</div>
+						{% else %}
+							<div class="card-body text-center">
+								<p>Aucune recette trouvée</p>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+
+				<!-- Recette la plus ajoutée en favoris -->
+				<div class="col-md-4 mb-4">
+					<div class="card shadow-sm h-100">
+						{% if mostFavorited %}
+							{% if mostFavorited.image %}
+								<img src="{{ mostFavorited.image }}" class="card-img-top" alt="{{ mostFavorited.title }}">
+							{% endif %}
+							<div class="card-body">
+								<h3 class="card-title">{{ mostFavorited.title }}</h3>
+								<p class="mb-2">
+									<strong>Catégorie:</strong>
+									{{ mostFavorited.category.name }}</p>
+								<p class="mb-2">
+									<strong>Préparation:</strong>
+									{{ mostFavorited.preparationTime }}
+									min</p>
+								<p class="card-text">{{ mostFavorited.description|u.truncate(100, '...') }}</p>
+							</div>
+							<div class="card-footer text-muted text-center">
+								❤️
+								{{ mostFavorited.favorites|length }}
+								favoris
+							</div>
+						{% else %}
+							<div class="card-body text-center">
+								<p>Aucune recette trouvée</p>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+{% endblock %}
