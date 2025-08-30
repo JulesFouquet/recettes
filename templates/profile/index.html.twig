@@ -1,11 +1,100 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon Profil
-{% endblock %}
+{% block title %}Mon Profil{% endblock %}
 
 {% block body %}
-	<div class="container mt-5">
-		<h1>Mon profil</h1>
-		<p>Bientôt ici : favoris, recettes créées, etc.</p>
-	</div>
+<div class="container mt-5">
+    <div class="row">
+        <!-- Colonne avatar -->
+        <div class="col-md-3 text-center">
+            <form id="avatarForm" action="{{ path('profile_upload_avatar') }}" method="POST" enctype="multipart/form-data">
+                <input type="file" name="avatar" id="avatarInput" style="display:none;" accept="image/*" onchange="document.getElementById('avatarForm').submit();">
+
+                {% if app.user.avatar %}
+                    <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" class="rounded-circle img-thumbnail" style="width:150px; height:150px; object-fit:cover; cursor:pointer;" alt="{{ app.user.username }}" onclick="document.getElementById('avatarInput').click();">
+                {% else %}
+                    <img src="{{ asset('images/default-avatar.png') }}" class="rounded-circle img-thumbnail" style="width:150px; height:150px; object-fit:cover; cursor:pointer;" alt="Avatar par défaut" onclick="document.getElementById('avatarInput').click();">
+                {% endif %}
+            </form>
+            <h3 class="mt-3">{{ app.user.username }}</h3>
+        </div>
+
+        <!-- Colonne infos utilisateur -->
+        <div class="col-md-9">
+            <div class="card p-3 mb-4">
+                <form method="POST" action="{{ path('profile') }}">
+                    <textarea name="presentation" class="form-control" rows="5" placeholder="Présentez-vous...">{{ user.presentation }}</textarea>
+                    <div class="text-end mt-2">
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Section recettes créées par l'utilisateur -->
+            <h4>Mes recettes</h4>
+            {% if recipes|length > 0 %}
+                <div id="userRecipesCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for recipeBatch in recipes|batch(3) %}
+                            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                <div class="row">
+                                    {% for recipe in recipeBatch %}
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card h-100">
+                                                {% if recipe.image %}
+                                                    <img src="{{ asset('uploads/recipes/' ~ recipe.image) }}" class="card-img-top" alt="{{ recipe.title }}">
+                                                {% else %}
+                                                    <img src="https://via.placeholder.com/400x200?text=Recette" class="card-img-top" alt="{{ recipe.title }}">
+                                                {% endif %}
+                                                <div class="card-body d-flex flex-column">
+                                                    <h5 class="card-title">{{ recipe.title }}</h5>
+                                                    <p class="card-text">{{ recipe.description|slice(0, 80) ~ '...' }}</p>
+                                                    <a href="{{ path('recipe_edit', {'id': recipe.id}) }}" class="btn btn-sm btn-outline-primary mt-auto">Modifier</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#userRecipesCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Précédent</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#userRecipesCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Suivant</span>
+                    </button>
+                </div>
+            {% else %}
+                <p class="text-muted">Vous n'avez créé aucune recette pour le moment.</p>
+            {% endif %}
+
+            <!-- Section recettes favorites -->
+            <h4 class="mt-4">Mes favoris</h4>
+            {% if app.user.favorites|length > 0 %}
+                <div class="row">
+                    {% for fav in app.user.favorites %}
+                        {% set r = fav.recipe %}
+                        <div class="col-md-3 mb-3">
+                            <div class="card h-100">
+                                {% if r.image %}
+                                    <img src="{{ asset('uploads/recipes/' ~ r.image) }}" class="card-img-top" alt="{{ r.title }}">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/400x200?text=Recette" class="card-img-top" alt="{{ r.title }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ r.title }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Vous n'avez aucun favori pour le moment.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

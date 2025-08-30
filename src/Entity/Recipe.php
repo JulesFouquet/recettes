@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\User;
 
 #[ORM\Entity(repositoryClass: RecipeRepository::class)]
 class Recipe
@@ -43,6 +44,10 @@ class Recipe
     #[ORM\ManyToOne(inversedBy: 'recipes')]
     private ?Category $category = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'recipes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null; // ✅ relation avec User
+
     /**
      * @var Collection<int, Favorite>
      */
@@ -66,6 +71,10 @@ class Recipe
         $this->views = 0;
     }
 
+    // -----------------------
+    // GETTERS / SETTERS
+    // -----------------------
+
     public function getId(): ?int
     {
         return $this->id;
@@ -79,7 +88,6 @@ class Recipe
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -91,7 +99,6 @@ class Recipe
     public function setDescription(string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -103,7 +110,6 @@ class Recipe
     public function setIngredients(string $ingredients): static
     {
         $this->ingredients = $ingredients;
-
         return $this;
     }
 
@@ -115,7 +121,6 @@ class Recipe
     public function setSteps(string $steps): static
     {
         $this->steps = $steps;
-
         return $this;
     }
 
@@ -127,7 +132,6 @@ class Recipe
     public function setPreparationTime(int $preparationTime): static
     {
         $this->preparationTime = $preparationTime;
-
         return $this;
     }
 
@@ -139,7 +143,6 @@ class Recipe
     public function setImage(?string $image): static
     {
         $this->image = $image;
-
         return $this;
     }
 
@@ -151,7 +154,6 @@ class Recipe
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
@@ -163,7 +165,6 @@ class Recipe
     public function setUpdatedAt(?\DateTime $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
-
         return $this;
     }
 
@@ -175,13 +176,20 @@ class Recipe
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, Favorite>
-     */
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+        return $this;
+    }
+
     public function getFavorites(): Collection
     {
         return $this->favorites;
@@ -193,7 +201,6 @@ class Recipe
             $this->favorites->add($favorite);
             $favorite->setRecipe($this);
         }
-
         return $this;
     }
 
@@ -204,13 +211,9 @@ class Recipe
                 $favorite->setRecipe(null);
             }
         }
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, Rating>
-     */
     public function getRatings(): Collection
     {
         return $this->ratings;
@@ -222,7 +225,6 @@ class Recipe
             $this->ratings->add($rating);
             $rating->setRecipe($this);
         }
-
         return $this;
     }
 
@@ -233,7 +235,6 @@ class Recipe
                 $rating->setRecipe(null);
             }
         }
-
         return $this;
     }
 
@@ -245,7 +246,6 @@ class Recipe
     public function setViews(int $views): static
     {
         $this->views = $views;
-
         return $this;
     }
 
@@ -257,15 +257,11 @@ class Recipe
 
     public function getAverageRating(): float
     {
-        if ($this->ratings->count() === 0) {
-            return 0;
-        }
-
+        if ($this->ratings->count() === 0) return 0;
         $sum = 0;
         foreach ($this->ratings as $rating) {
-            $sum += $rating->getValue(); // correction
+            $sum += $rating->getValue();
         }
-
         return $sum / $this->ratings->count();
     }
 
