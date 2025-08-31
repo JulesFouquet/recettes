@@ -1,203 +1,156 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil - GourmetHub
-{% endblock %}
+{% block title %}Accueil - GourmetHub{% endblock %}
 
 {% block body %}
-	<div
-		class="container mt-5">
+<div class="container mt-5">
 
-		<!-- Section de bienvenue -->
-		<section class="text-center mb-5">
-			<h1 class="display-4 fw-bold">Bienvenue sur GourmetHub</h1>
-			<p class="lead">Découvrez, partagez et sauvegardez vos recettes de cuisine préférées !</p>
-			<a href="{{ path('recipe_index') }}" class="btn btn-primary btn-lg mt-3">Voir toutes les recettes</a>
-		</section>
+    <!-- Section de bienvenue -->
+    <section class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Bienvenue sur GourmetHub</h1>
+        <p class="lead">Découvrez, partagez et sauvegardez vos recettes de cuisine préférées !</p>
+    </section>
 
-		<!-- Section recettes populaires -->
-		<section>
-			<h2 class="mb-4">Nos recettes populaires</h2>
+    <!-- Section recettes populaires -->
+    <section class="mb-5">
 
-			<div
-				class="row">
+        <!-- Recette la plus vue -->
+        <article class="mb-5">
+            <h3 class="mb-4 text-center fw-bold">La recette la plus vue</h3>
+            {% if mostViewed %}
+                <div class="card border-0 shadow-sm mb-4">
+                    {% if mostViewed.image %}
+                        <img src="{{ asset('uploads/recipes/' ~ mostViewed.image) }}" class="img-fluid rounded-top" alt="{{ mostViewed.title }}">
+                    {% endif %}
+                    <div class="card-body p-4">
+                        <h4 class="card-title h3">{{ mostViewed.title }}</h4>
+                        <p class="text-muted mb-2">
+                            <strong>Catégorie :</strong> {{ mostViewed.category.name }} |
+                            <strong>Préparation :</strong> {{ mostViewed.preparationTime }} min
+                        </p>
+                        <p class="card-text">{{ mostViewed.description }}</p>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                        <a href="{{ path('recipe_index') }}" class="btn btn-primary btn-sm">Voir la recette</a>
+                        <span class="badge bg-primary">{{ mostViewed.views }} vues</span>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center text-muted">Aucune recette trouvée.</p>
+            {% endif %}
+        </article>
 
-				<!-- Recette la plus vue -->
-				<div class="col-md-4 mb-4">
-					<div class="card shadow-sm h-100 text-white" style="
-							                    {% if mostViewed and mostViewed.image %}
-							                        background-image: url('{{ asset('uploads/recipes/' ~ mostViewed.image) }}');
-							                    {% else %}
-							                        background-color: #6c757d;
-							                    {% endif %}
-							                    background-size: cover;
-							                    background-position: center;
-							                    min-height: 300px;
-							                ">
-						<div class="card-body d-flex flex-column" style="background: rgba(0,0,0,0.5);">
-							{% if mostViewed %}
-								<h3 class="card-title">{{ mostViewed.title }}</h3>
-								<p class="mb-2">
-									<strong>Catégorie:</strong>
-									{{ mostViewed.category.name }}</p>
-								<p class="mb-2">
-									<strong>Préparation:</strong>
-									{{ mostViewed.preparationTime }}
-									min</p>
-								<p class="card-text">{{ mostViewed.description|u.truncate(100, '...') }}</p>
-							{% else %}
-								<p class="text-center">Aucune recette trouvée</p>
-							{% endif %}
-						</div>
-						{% if mostViewed %}
-							<div class="card-footer text-muted text-center bg-dark bg-opacity-50">
-								{{ mostViewed.views }}
-								vues
-							</div>
-						{% endif %}
-					</div>
-				</div>
+        <!-- Recette la mieux notée -->
+        <article class="mb-5">
+            <h3 class="mb-4 text-center fw-bold">La recette la mieux notée</h3>
+            {% if bestRated %}
+                <div class="card border-0 shadow-sm mb-4">
+                    {% if bestRated.image %}
+                        <img src="{{ asset('uploads/recipes/' ~ bestRated.image) }}" class="img-fluid rounded-top" alt="{{ bestRated.title }}">
+                    {% endif %}
+                    <div class="card-body p-4">
+                        <h4 class="card-title h3">{{ bestRated.title }}</h4>
+                        <p class="text-muted mb-2">
+                            <strong>Catégorie :</strong> {{ bestRated.category.name }} |
+                            <strong>Préparation :</strong> {{ bestRated.preparationTime }} min
+                        </p>
+                        <p class="card-text">{{ bestRated.description }}</p>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                        <a href="{{ path('recipe_index') }}" class="btn btn-primary btn-sm">Voir la recette</a>
+                        <span class="badge bg-success">
+                            {{ bestRated.getAverageRating()|number_format(1) }}/5 ({{ bestRated.ratings|length }} votes)
+                        </span>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center text-muted">Aucune recette trouvée.</p>
+            {% endif %}
+        </article>
 
-				<!-- Recette la mieux notée -->
-				<div class="col-md-4 mb-4">
-					<div class="card shadow-sm h-100 text-white" style="
-							                    {% if bestRated and bestRated.image %}
-							                        background-image: url('{{ asset('uploads/recipes/' ~ bestRated.image) }}');
-							                    {% else %}
-							                        background-color: #6c757d;
-							                    {% endif %}
-							                    background-size: cover;
-							                    background-position: center;
-							                    min-height: 300px;
-							                ">
-						<div class="card-body d-flex flex-column" style="background: rgba(0,0,0,0.5);">
-							{% if bestRated %}
-								<h3 class="card-title">{{ bestRated.title }}</h3>
-								<p class="mb-2">
-									<strong>Catégorie:</strong>
-									{{ bestRated.category.name }}</p>
-								<p class="mb-2">
-									<strong>Préparation:</strong>
-									{{ bestRated.preparationTime }}
-									min</p>
-								<p class="card-text">{{ bestRated.description|u.truncate(100, '...') }}</p>
-							{% else %}
-								<p class="text-center">Aucune recette trouvée</p>
-							{% endif %}
-						</div>
-						{% if bestRated %}
-							<div class="card-footer text-center bg-dark bg-opacity-50">
-								<div class="rating" data-recipe="{{ bestRated.id }}">
-									{% for i in 1..5 %}
-										<span class="star {% if bestRated.getAverageRating() >= i %}selected{% endif %}" data-value="{{ i }}">★</span>
-									{% endfor %}
-								</div>
-								<div class="small text-muted mt-1">
-									Moyenne :
-									{{ bestRated.getAverageRating()|number_format(1) }}/5 ({{ bestRated.ratings|length }}
-									votes)
-								</div>
-							</div>
-						{% endif %}
-					</div>
-				</div>
+        <!-- Recette la plus ajoutée en favoris -->
+        <article class="mb-5">
+            <h3 class="mb-4 text-center fw-bold">La recette la plus ajoutée en favoris</h3>
+            {% if mostFavorited %}
+                <div class="card border-0 shadow-sm mb-4">
+                    {% if mostFavorited.image %}
+                        <img src="{{ asset('uploads/recipes/' ~ mostFavorited.image) }}" class="img-fluid rounded-top" alt="{{ mostFavorited.title }}">
+                    {% endif %}
+                    <div class="card-body p-4">
+                        <h4 class="card-title h3">{{ mostFavorited.title }}</h4>
+                        <p class="text-muted mb-2">
+                            <strong>Catégorie :</strong> {{ mostFavorited.category.name }} |
+                            <strong>Préparation :</strong> {{ mostFavorited.preparationTime }} min
+                        </p>
+                        <p class="card-text">{{ mostFavorited.description }}</p>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                        <a href="{{ path('recipe_index') }}" class="btn btn-primary btn-sm">Voir la recette</a>
+                        <span class="badge bg-danger">{{ mostFavorited.favorites|length }} favoris</span>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center text-muted">Aucune recette trouvée.</p>
+            {% endif %}
+        </article>
 
-				<!-- Recette la plus ajoutée en favoris -->
-				<div class="col-md-4 mb-4">
-					<div class="card shadow-sm h-100 text-white" style="
-							                    {% if mostFavorited and mostFavorited.image %}
-							                        background-image: url('{{ asset('uploads/recipes/' ~ mostFavorited.image) }}');
-							                    {% else %}
-							                        background-color: #6c757d;
-							                    {% endif %}
-							                    background-size: cover;
-							                    background-position: center;
-							                    min-height: 300px;
-							                ">
-						<div class="card-body d-flex flex-column" style="background: rgba(0,0,0,0.5);">
-							{% if mostFavorited %}
-								<h3 class="card-title">{{ mostFavorited.title }}</h3>
-								<p class="mb-2">
-									<strong>Catégorie:</strong>
-									{{ mostFavorited.category.name }}</p>
-								<p class="mb-2">
-									<strong>Préparation:</strong>
-									{{ mostFavorited.preparationTime }}
-									min</p>
-								<p class="card-text">{{ mostFavorited.description|u.truncate(100, '...') }}</p>
-							{% else %}
-								<p class="text-center">Aucune recette trouvée</p>
-							{% endif %}
-						</div>
-						{% if mostFavorited %}
-							<div class="card-footer text-muted text-center bg-dark bg-opacity-50">
-								❤️
-								{{ mostFavorited.favorites|length }}
-								favoris
-							</div>
-						{% endif %}
-					</div>
-				</div>
+    </section>
+</div>
 
-			</div>
-		</section>
-	</div>
-
-	<style>
-		.rating .star {
-			font-size: 1.8rem;
-			cursor: pointer;
-			color: #ddd;
-			transition: color 0.2s;
-		}
-		.rating .star:hover,
-		.rating .star.hover,
-		.rating .star.selected {
-			color: #ffc107;
-		}
-	</style>
-
-	<script>
-		document.addEventListener("DOMContentLoaded", () => {
-const ratingContainer = document.querySelector(".rating");
-if (ratingContainer) {
-const stars = ratingContainer.querySelectorAll(".star");
-const recipeId = ratingContainer.dataset.recipe;
-
-stars.forEach(star => {
-star.addEventListener("mouseover", () => {
-stars.forEach(s => s.classList.remove("hover"));
-star.classList.add("hover");
-let prev = star.previousElementSibling;
-while (prev) {
-prev.classList.add("hover");
-prev = prev.previousElementSibling;
+<style>
+    .rating .star {
+        font-size: 1.8rem;
+        cursor: pointer;
+        color: #ddd;
+        transition: color 0.2s;
+    }
+    .rating .star:hover,
+    .rating .star.hover,
+    .rating .star.selected {
+        color: #ffc107;
+    }
+	.card {
+    transition: none !important; /* Désactive toute transition */
 }
-});
-star.addEventListener("mouseleave", () => stars.forEach(s => s.classList.remove("hover")));
-star.addEventListener("click", () => {
-const value = star.dataset.value;
-fetch (`/recipe/${recipeId}/rate-ajax`, {
-method: "POST",
-headers: {
-"Content-Type": "application/json"
-},
-body: JSON.stringify(
-{value: value}
-)
-}).then(r => r.json()).then(data => {
-if (data.success) {
-stars.forEach(s => s.classList.remove("selected"));
-for (let i = 0; i < value; i++) {
-stars[i].classList.add("selected");
+
+.card:hover {
+    transform: none !important; /* Empêche le zoom ou le déplacement */
 }
-document.getElementById("avg-rating").textContent = data.newAverage;
-} else {
-alert(data.error || "Erreur lors de l'envoi de la note");
-}
+
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const ratingContainer = document.querySelector(".rating");
+    if (ratingContainer) {
+        const stars = ratingContainer.querySelectorAll(".star");
+        const recipeId = ratingContainer.dataset.recipe;
+        stars.forEach(star => {
+            star.addEventListener("mouseover", () => {
+                stars.forEach(s => s.classList.remove("hover"));
+                star.classList.add("hover");
+                let prev = star.previousElementSibling;
+                while(prev) { prev.classList.add("hover"); prev = prev.previousElementSibling; }
+            });
+            star.addEventListener("mouseleave", () => stars.forEach(s => s.classList.remove("hover")));
+            star.addEventListener("click", () => {
+                const value = star.dataset.value;
+                fetch(`/recipe/${recipeId}/rate-ajax`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({value: value})
+                }).then(r => r.json()).then(data => {
+                    if (data.success) {
+                        stars.forEach(s => s.classList.remove("selected"));
+                        for(let i=0;i<value;i++){stars[i].classList.add("selected");}
+                        document.getElementById("avg-rating").textContent = data.newAverage;
+                    } else {
+                        alert(data.error || "Erreur lors de l'envoi de la note");
+                    }
+                });
+            });
+        });
+    }
 });
-});
-});
-}
-});
-	</script>
+</script>
 {% endblock %}

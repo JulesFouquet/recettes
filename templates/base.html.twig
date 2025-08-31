@@ -61,9 +61,78 @@
 				{% endfor %}
 			</div>
 
+
 			{% block body %}{% endblock %}
 
 			<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 			{% block javascripts %}{% endblock %}
+			<!-- Footer -->
+			<footer class="bg-dark text-white mt-5">
+				<div class="container py-5">
+					<div
+						class="row">
+
+						<!-- À propos -->
+						<div class="col-md-4 mb-4">
+							<h5 class="fw-bold">GourmetHub</h5>
+							<p>Découvrez, partagez et sauvegardez vos recettes préférées. GourmetHub vous accompagne dans votre passion culinaire !</p>
+						</div>
+
+						<!-- Liens rapides -->
+						<div class="col-md-2 mb-4">
+							<h6 class="fw-bold">Liens rapides</h6>
+							<ul class="list-unstyled">
+								<li>
+									<a href="{{ path('home') }}" class="text-white text-decoration-none">Accueil</a>
+								</li>
+								<li>
+									<a href="{{ path('recipe_index') }}" class="text-white text-decoration-none">Recettes</a>
+								</li>
+								{% if app.user %}
+									<li>
+										<a href="{{ path('profile', {'id': app.user.id}) }}" class="text-white text-decoration-none">Mon profil</a>
+									</li>
+								{% endif %}
+							</ul>
+						</div>
+
+						<!-- Réseaux sociaux -->
+						<div class="col-md-3 mb-4">
+							<h6 class="fw-bold">Suivez-nous</h6>
+							<div class="d-flex gap-3">
+								<a href="#" class="text-white fs-4">
+									<i class="fab fa-facebook"></i>
+								</a>
+								<a href="#" class="text-white fs-4">
+									<i class="fab fa-twitter"></i>
+								</a>
+								<a href="#" class="text-white fs-4">
+									<i class="fab fa-instagram"></i>
+								</a>
+								<a href="#" class="text-white fs-4">
+									<i class="fab fa-pinterest"></i>
+								</a>
+							</div>
+						</div>
+
+						<!-- Newsletter -->
+						<div class="col-md-3 mb-4">
+							<h6 class="fw-bold">Newsletter</h6>
+							<p>Recevez nos dernières recettes directement par email.</p>
+							<form action="#" method="POST" class="d-flex flex-column gap-2">
+								<input type="email" class="form-control" placeholder="Votre email" required>
+								<button type="submit" class="btn btn-primary btn-sm">S'abonner</button>
+							</form>
+						</div>
+
+					</div>
+					<hr class="bg-secondary">
+					<div class="text-center small">
+						&copy;
+						{{ "now"|date("Y") }}
+						GourmetHub. Tous droits réservés.
+					</div>
+				</div>
+			</footer>
 		</body>
 	</html>

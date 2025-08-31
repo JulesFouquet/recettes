@@ -1,186 +1,262 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}GourmetHub - Recettes
-{% endblock %}
+{% block title %}GourmetHub - Recettes{% endblock %}
 
 {% block body %}
-	<div class="container mt-5 text-center">
-		<h1 class="display-4 fw-bold">GourmetHub</h1>
-		<p class="lead mb-5">
-			Découvrez, partagez et gérez vos recettes préférées facilement.
-									        Explorez par catégorie, temps de préparation ou ingrédient.
-		</p>
+<div class="container mt-5 text-center">
+    <h1 class="display-4 fw-bold">GourmetHub</h1>
+    <p class="lead mb-5">
+        Découvrez, partagez et gérez vos recettes préférées facilement.
+        Explorez par catégorie, temps de préparation ou ingrédient.
+    </p>
 
-		{% if app.user %}
-			<a href="{{ path('recipe_new') }}" class="btn btn-lg btn-success mb-4">
-				Ajouter une recette
-			</a>
-		{% endif %}
+   <!-- Section ajout + filtres et recherche -->
+<div class="mb-4 row align-items-center">
+    <!-- Bouton Ajouter une recette -->
+    <div class="col-md-3 text-md-start text-center mb-3 mb-md-0">
+        {% if app.user %}
+            <a href="{{ path('recipe_new') }}" class="btn btn-lg btn-success">
+                Ajouter une recette
+            </a>
+        {% endif %}
+    </div>
 
-		<div class="row row-cols-1 row-cols-md-3 g-4">
-			{% for recipe in recipes %}
-				<div class="col">
-					<div class="card h-100 shadow-sm text-white" style="
-																					                    {% if recipe.image %}
-																					                        background-image: url('{{ asset('uploads/recipes/' ~ recipe.image) }}');
-																					                    {% else %}
-																					                        background-color: #6c757d;
-																					                    {% endif %}
-																					                    background-size: cover;
-																					                    background-position: center;
-																					                    min-height: 300px;
-																					                ">
-						<div class="card-body d-flex flex-column" style="background: rgba(0,0,0,0.5);">
-							<h5 class="card-title">{{ recipe.title }}</h5>
-							<p class="card-text">{{ recipe.description|slice(0, 80) ~ '...' }}</p>
-							<p class="mb-1">
-								<strong>Catégorie:</strong>
-								{{ recipe.category.name }}</p>
-							<p class="mb-1">
-								<strong>Préparation:</strong>
-								{{ recipe.preparationTime }}
-								min</p>
-							<div class="mt-auto d-flex justify-content-between align-items-center">
-								<a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#recipeModal{{ recipe.id }}">
-									Voir
-								</a>
-								<button class="btn btn-sm btn-outline-warning favorite-btn" data-id="{{ recipe.id }}">
-									<i class="fa-regular fa-star"></i>
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
+    <!-- Filtres et recherche -->
+    <div class="col-md-9 d-flex flex-column flex-md-row justify-content-md-end justify-content-center align-items-center gap-3">
+        <!-- Tri par catégorie -->
+        <select id="filter-category" class="form-select w-auto">
+            <option value="">Toutes les catégories</option>
+            {% for category in categories %}
+                <option value="{{ category.name }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
 
-				{# Modale pour la recette #}
-<div class="modal fade" id="recipeModal{{ recipe.id }}" tabindex="-1" aria-labelledby="recipeModalLabel{{ recipe.id }}" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="recipeModalLabel{{ recipe.id }}">{{ recipe.title }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-            </div>
-            <div class="modal-body">
-                {# Auteur de la recette #}
-				{% if recipe.user %}
-				<div class="d-flex align-items-center mb-3">
-    				{% if recipe.user.avatar %}
-        				<img src="{{ asset('uploads/avatars/' ~ recipe.user.avatar) }}" alt="{{ recipe.user.username }}" class="rounded-circle me-2" style="width:40px; height:40px; object-fit:cover;">
-    				{% else %}
-        				<img src="{{ asset('images/default-avatar.png') }}" alt="{{ recipe.user.username }}" class="rounded-circle me-2" style="width:40px; height:40px; object-fit:cover;">
-    				{% endif %}
-    					<a href="{{ path('user_show', {'id': recipe.user.id}) }}" class="fw-bold text-decoration-none">{{ recipe.user.username }}</a>
-				</div>
-				{% endif %}
+        <!-- Tri par temps de préparation -->
+        <select id="filter-time" class="form-select w-auto">
+            <option value="">Tous les temps</option>
+            <option value="<30">&lt; 30 min</option>
+            <option value="30-60">30 - 60 min</option>
+            <option value="60-120">1 - 2 h</option>
+            <option value=">120">&gt; 2 h</option>
+        </select>
 
-
-                {% if recipe.image %}
-                    <img src="{{ asset('uploads/recipes/' ~ recipe.image) }}" class="img-fluid mb-3" alt="{{ recipe.title }}">
-                {% endif %}
-                <p><strong>Description:</strong> {{ recipe.description }}</p>
-                <p><strong>Ingrédients:</strong></p>
-                <pre>{{ recipe.ingredients }}</pre>
-                <p><strong>Étapes:</strong></p>
-                <pre>{{ recipe.steps }}</pre>
-                <p><strong>Catégorie:</strong> {{ recipe.category.name }}</p>
-                <p><strong>Préparation:</strong> {{ recipe.preparationTime }} min</p>
-
-                <hr>
-
-                {# Section notation #}
-                <div class="rating-section text-center">
-                    {% set userRating = null %}
-                    {% for r in recipe.ratings %}
-                        {% if app.user and r.user.id == app.user.id %}
-                            {% set userRating = r.value %}
-                        {% endif %}
-                    {% endfor %}
-
-                    <p>
-                        Note moyenne :
-                        <span id="average-rating-{{ recipe.id }}">
-                            {{ recipe.getAverageRating() ? recipe.getAverageRating()|number_format(1) : 'Pas encore notée' }}
-                        </span>
-                        ({{ recipe.ratings|length }} vote{{ recipe.ratings|length > 1 ? 's' : '' }})
-                    </p>
-
-                    {% if app.user %}
-                        <div class="rating-stars" data-recipe-id="{{ recipe.id }}">
-                            {% for i in 1..5 %}
-                                <i class="fa-star star {{ i <= (userRating ?: 0) ? 'fa-solid' : 'fa-regular' }}" data-value="{{ i }}" style="cursor:pointer; font-size:1.5rem;"></i>
-                            {% endfor %}
-                        </div>
-                        <small id="rating-feedback-{{ recipe.id }}" class="text-success d-block mt-2"></small>
-                    {% else %}
-                        <p class="text-muted">Connectez-vous pour noter cette recette.</p>
-                    {% endif %}
-                </div>
-            </div>
+        <!-- Recherche -->
+        <div class="input-group w-auto">
+            <input type="text" id="search-keyword" class="form-control" placeholder="Recherche par titre ou ingrédient">
+            <button id="btn-search" class="btn btn-primary ms-2">Rechercher</button>
         </div>
     </div>
 </div>
 
 
-			{% else %}
-				<p class="text-muted mt-5">Aucune recette pour le moment. Soyez le premier à en ajouter !</p>
-			{% endfor %}
-		</div>
-	</div>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for recipe in recipes %}
+            <div class="col">
+                <div class="card h-100 shadow-sm text-white" style="
+                        {% if recipe.image %}
+                            background-image: url('{{ asset('uploads/recipes/' ~ recipe.image) }}');
+                        {% else %}
+                            background-color: #6c757d;
+                        {% endif %}
+                        background-size: cover;
+                        background-position: center;
+                        min-height: 300px;">
+                    <div class="card-body d-flex flex-column" style="background: rgba(0,0,0,0.5);">
+                        <h5 class="card-title">{{ recipe.title }}</h5>
+                        <p class="card-text">{{ recipe.description|slice(0, 80) ~ '...' }}</p>
+                        <p class="mb-1"><strong>Catégorie:</strong> {{ recipe.category.name }}</p>
+                        <p class="mb-1"><strong>Préparation:</strong> {{ recipe.preparationTime }} min</p>
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#recipeModal{{ recipe.id }}">
+                                Voir
+                            </a>
+                            <button class="btn btn-sm btn-outline-warning favorite-btn" data-id="{{ recipe.id }}">
+                                <i class="fa-regular fa-star"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modale pour la recette -->
+            <div class="modal fade" id="recipeModal{{ recipe.id }}" tabindex="-1" aria-labelledby="recipeModalLabel{{ recipe.id }}" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="recipeModalLabel{{ recipe.id }}">{{ recipe.title }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% if recipe.user %}
+                                <div class="d-flex align-items-center mb-3">
+                                    {% if recipe.user.avatar %}
+                                        <img src="{{ asset('uploads/avatars/' ~ recipe.user.avatar) }}" alt="{{ recipe.user.username }}" class="rounded-circle me-2" style="width:40px; height:40px; object-fit:cover;">
+                                    {% else %}
+                                        <img src="{{ asset('images/default-avatar.png') }}" alt="{{ recipe.user.username }}" class="rounded-circle me-2" style="width:40px; height:40px; object-fit:cover;">
+                                    {% endif %}
+                                    <a href="{{ path('user_show', {'id': recipe.user.id}) }}" class="fw-bold text-decoration-none">{{ recipe.user.username }}</a>
+                                </div>
+                            {% endif %}
+
+                            {% if recipe.image %}
+                                <img src="{{ asset('uploads/recipes/' ~ recipe.image) }}" class="img-fluid mb-3" alt="{{ recipe.title }}">
+                            {% endif %}
+                            <p><strong>Description:</strong> {{ recipe.description }}</p>
+                            <p><strong>Ingrédients:</strong></p>
+                            <pre>{{ recipe.ingredients }}</pre>
+                            <p><strong>Étapes:</strong></p>
+                            <pre>{{ recipe.steps }}</pre>
+                            <p><strong>Catégorie:</strong> {{ recipe.category.name }}</p>
+                            <p><strong>Préparation:</strong> {{ recipe.preparationTime }} min</p>
+
+                            <hr>
+
+                            <!-- Section notation -->
+                            <div class="rating-section text-center">
+                                {% set userRating = null %}
+                                {% for r in recipe.ratings %}
+                                    {% if app.user and r.user.id == app.user.id %}
+                                        {% set userRating = r.value %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                <p>
+                                    Note moyenne :
+                                    <span id="average-rating-{{ recipe.id }}">
+                                        {{ recipe.getAverageRating() ? recipe.getAverageRating()|number_format(1) : 'Pas encore notée' }}
+                                    </span>
+                                    ({{ recipe.ratings|length }} vote{{ recipe.ratings|length > 1 ? 's' : '' }})
+                                </p>
+
+                                {% if app.user %}
+                                    <div class="rating-stars" data-recipe-id="{{ recipe.id }}">
+                                        {% for i in 1..5 %}
+                                            <i class="fa-star star {{ i <= (userRating ?: 0) ? 'fa-solid' : 'fa-regular' }}" data-value="{{ i }}" style="cursor:pointer; font-size:1.5rem;"></i>
+                                        {% endfor %}
+                                    </div>
+                                    <small id="rating-feedback-{{ recipe.id }}" class="text-success d-block mt-2"></small>
+                                {% else %}
+                                    <p class="text-muted">Connectez-vous pour noter cette recette.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {% else %}
+            <p class="text-muted mt-5">Aucune recette pour le moment. Soyez le premier à en ajouter !</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Force tout le texte à l'intérieur des cartes de recette à être blanc */
+        .card-body {
+            color: #fff !important;
+        }
+
+        .card-body h5,
+        .card-body p,
+        .card-body strong,
+        .card-body small {
+            color: #fff !important;
+        }
+    </style>
 {% endblock %}
 
+
 {% block javascripts %}
-	<script>
-		document.addEventListener('DOMContentLoaded', function () { // Gestion favoris
-const buttons = document.querySelectorAll('.favorite-btn');
-buttons.forEach(btn => {
-btn.addEventListener('click', function () {
-const recipeId = this.dataset.id;
-const csrfToken = '{{ csrf_token("authenticate") }}';
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Filtres et recherche
+    const categorySelect = document.getElementById('filter-category');
+    const timeSelect = document.getElementById('filter-time');
+    const searchInput = document.getElementById('search-keyword');
+    const searchBtn = document.getElementById('btn-search');
+    const recipeCards = document.querySelectorAll('.row .col');
 
-fetch('{{ path("favorite_toggle", {"id": "REPLACE_ID"}) }}'.replace('REPLACE_ID', recipeId), {
-method: 'POST',
-headers: {
-'X-Requested-With': 'XMLHttpRequest',
-'X-CSRF-TOKEN': csrfToken
-}
-}).then(response => response.json()).then(data => {
-if (data.status === 'added') {
-this.querySelector('i').classList.remove('fa-regular');
-this.querySelector('i').classList.add('fa-solid');
-} else if (data.status === 'removed') {
-this.querySelector('i').classList.remove('fa-solid');
-this.querySelector('i').classList.add('fa-regular');
-}
-}).catch(err => console.error('Erreur favorite:', err));
-});
-});
+    function filterRecipes() {
+        const category = categorySelect.value;
+        const time = timeSelect.value;
+        const keyword = searchInput.value.toLowerCase();
 
-// Gestion étoiles notation
-const ratingStars = document.querySelectorAll('.rating-stars .star');
-ratingStars.forEach(star => {
-star.addEventListener('click', function () {
-const value = this.dataset.value;
-const recipeId = this.closest('.rating-stars').dataset.recipeId;
-const csrfToken = '{{ csrf_token("authenticate") }}';
+        recipeCards.forEach(card => {
+            const cardTitle = card.querySelector('.card-title').textContent.toLowerCase();
+            const cardDesc = card.querySelector('.card-text').textContent.toLowerCase();
+            const cardCategory = card.querySelector('.mb-1 strong').nextSibling.textContent.trim();
+            const prepTimeText = card.querySelectorAll('.mb-1')[1].textContent;
+            const prepTime = parseInt(prepTimeText.replace(/\D/g,''));
+            let show = true;
 
-fetch('{{ path("rating_add", {"id": "REPLACE_ID"}) }}'.replace('REPLACE_ID', recipeId), {
-method: 'POST',
-headers: {
-'Content-Type': 'application/json',
-'X-Requested-With': 'XMLHttpRequest',
-'X-CSRF-TOKEN': csrfToken
-},
-body: JSON.stringify(
-{rating: value}
-)
-}).then(res => res.json()).then(data => {
-if (data.success) {
-document.getElementById('average-rating-' + recipeId).textContent = data.newAverage.toFixed(1);
-document.getElementById('rating-feedback-' + recipeId).textContent = "Merci pour votre note !";
+            if (category && cardCategory !== category) show = false;
+            if (time) {
+                switch(time) {
+                    case "<30": if (prepTime >= 30) show = false; break;
+                    case "30-60": if (prepTime < 30 || prepTime > 60) show = false; break;
+                    case "60-120": if (prepTime < 60 || prepTime > 120) show = false; break;
+                    case ">120": if (prepTime <= 120) show = false; break;
+                }
+            }
+            if (keyword && !(cardTitle.includes(keyword) || cardDesc.includes(keyword))) show = false;
 
-const stars = document.querySelectorAll('.rating-stars[data-recipe-id="' + recipeId + '"] .star');
-stars.forEach(s => {
-if (s.dataset.value<= value) {
+            card.style.display = show ? '' : 'none';
+        });
+    }
+
+    categorySelect.addEventListener('change', filterRecipes);
+    timeSelect.addEventListener('change', filterRecipes);
+    searchBtn.addEventListener('click', filterRecipes);
+
+    // Favoris
+    const buttons = document.querySelectorAll('.favorite-btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const recipeId = this.dataset.id;
+            const csrfToken = '{{ csrf_token("authenticate") }}';
+            fetch('{{ path("favorite_toggle", {"id": "REPLACE_ID"}) }}'.replace('REPLACE_ID', recipeId), {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            }).then(response => response.json()).then(data => {
+                if (data.status === 'added') {
+                    this.querySelector('i').classList.remove('fa-regular');
+                    this.querySelector('i').classList.add('fa-solid');
+                } else if (data.status === 'removed') {
+                    this.querySelector('i').classList.remove('fa-solid');
+                    this.querySelector('i').classList.add('fa-regular');
+                }
+            }).catch(err => console.error('Erreur favorite:', err));
+        });
+    });
+
+    // Notation
+    const ratingStars = document.querySelectorAll('.rating-stars .star');
+    ratingStars.forEach(star => {
+        star.addEventListener('click', function () {
+            const value = this.dataset.value;
+            const recipeId = this.closest('.rating-stars').dataset.recipeId;
+            const csrfToken = '{{ csrf_token("authenticate") }}';
+            fetch('{{ path("rating_add", {"id": "REPLACE_ID"}) }}'.replace('REPLACE_ID', recipeId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({rating: value})
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    document.getElementById('average-rating-' + recipeId).textContent = data.newAverage.toFixed(1);
+                    document.getElementById('rating-feedback-' + recipeId).textContent = "Merci pour votre note !";
+
+                    const stars = document.querySelectorAll('.rating-stars[data-recipe-id="' + recipeId + '"] .star');
+                    stars.forEach(s => {
+                        if (s.dataset.value <= value) {
                             s.classList.remove('fa-regular');
                             s.classList.add('fa-solid');
                         } else {
@@ -189,33 +265,23 @@ if (s.dataset.value<= value) {
                         }
                     });
                 }
-            }).catch(err => console.error('Erreur rating:', err)) 
+            }).catch(err => console.error('Erreur rating:', err))
+        });
+    });
 
-
-
-
-
+    // Incrémenter les vues à l'ouverture de la modale
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.addEventListener('show.bs.modal', function () {
+            const recipeId = this.id.replace('recipeModal', '');
+            fetch('{{ path("recipe_increment_view", {"id": "REPLACE_ID"}) }}'.replace('REPLACE_ID', recipeId), {
+                method: 'POST',
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            }).then(res => res.json()).then(data => {
+                console.log('Vues mise à jour pour la recette', recipeId, data.views);
+            }).catch(err => console.error('Erreur mise à jour vues:', err));
+        });
+    });
 });
-}
-);
-
-// Incrémenter les vues à l'ouverture de la modale
-const modals = document.querySelectorAll('.modal');
-modals.forEach(modal => {
-modal.addEventListener('show.bs.modal', function (event) {
-const recipeId = this.id.replace('recipeModal', '');
-fetch('{{ path("recipe_increment_view", {"id": "REPLACE_ID"}) }}'.replace('REPLACE_ID', recipeId), {
-method: 'POST',
-headers: {
-'X-Requested-With': 'XMLHttpRequest'
-}
-}).then(res => res.json()).then(data => {
-console.log('Vues mise à jour pour la recette', recipeId, data.views);
-}).catch(err => console.error('Erreur mise à jour vues:', err));
-});
-});
-}
-);
 </script>
 {% endblock %}
-

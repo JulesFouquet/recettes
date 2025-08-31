@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Recipe;
 use App\Form\RecipeType;
 use App\Repository\RecipeRepository;
+use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,12 +19,14 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 class RecipeController extends AbstractController
 {
     #[Route('/', name: 'recipe_index', methods: ['GET'])]
-    public function index(RecipeRepository $recipeRepository): Response
+    public function index(RecipeRepository $recipeRepository, CategoryRepository $categoryRepository): Response
     {
         $recipes = $recipeRepository->findAll();
+        $categories = $categoryRepository->findAll();
 
         return $this->render('recipe/index.html.twig', [
             'recipes' => $recipes,
+            'categories' => $categories,
         ]);
     }
 
@@ -43,7 +46,6 @@ class RecipeController extends AbstractController
             $recipe->setUser($user);
             $recipe->setCreatedAt(new \DateTimeImmutable());
 
-            // Gestion de l'image uploadée
             /** @var UploadedFile|null $imageFile */
             $imageFile = $form->get('image')->getData();
             if ($imageFile) {
@@ -88,7 +90,6 @@ class RecipeController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $recipe->setUpdatedAt(new \DateTime());
 
-            // Gestion de l'image uploadée
             /** @var UploadedFile|null $imageFile */
             $imageFile = $form->get('image')->getData();
             if ($imageFile) {
@@ -110,7 +111,7 @@ class RecipeController extends AbstractController
             return $this->redirectToRoute('profile');
         }
 
-        return $this->render('recipe/new.html.twig', [
+        return $this->render('recipe/edit.html.twig', [
             'recipe' => $recipe,
             'form' => $form,
         ]);
