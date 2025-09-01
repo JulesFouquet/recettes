@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>
-			{% block title %}GourmetHub
+			{% block title %}Le Canard Gourmand
 			{% endblock %}
 		</title>
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,7 +14,11 @@
 		<body>
 			<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm mb-4">
 				<div class="container">
-					<a class="navbar-brand fw-bold" href="{{ path('home') }}">GourmetHub</a>
+					<a class="navbar-brand fw-bold d-flex align-items-center" href="{{ path('home') }}">
+						<img src="{{ asset('images/logo.png') }}" alt="Le Canard Gourmand" style="height: 50px; width: auto; margin-right: 10px;">
+						Le Canard Gourmand
+					</a>
+
 					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
 						<span class="navbar-toggler-icon"></span>
 					</button>
@@ -74,8 +78,9 @@
 
 						<!-- À propos -->
 						<div class="col-md-4 mb-4">
-							<h5 class="fw-bold">GourmetHub</h5>
-							<p>Découvrez, partagez et sauvegardez vos recettes préférées. GourmetHub vous accompagne dans votre passion culinaire !</p>
+							<h5 class="fw-bold">Le Canard Gourmand</h5>
+							<p>Découvrez, partagez et sauvegardez vos recettes préférées. Le Canard Gourmand vous accompagne dans votre passion culinaire !</p>
+
 						</div>
 
 						<!-- Liens rapides -->
